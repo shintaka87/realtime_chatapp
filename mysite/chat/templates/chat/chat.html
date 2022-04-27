@@ -1,0 +1,196 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>My Chat</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <style type="text/css"></style>
+  </head>
+  <body>
+    <div id="div_container">
+      <div id="div_header">
+        <h1 onclick="onclickButton_LeaveChat()" class="chat-title">My Chat</h1>
+      </div>
+
+      <div id="div_main">
+        <div id="div_join_screen">
+          <form
+            action=""
+            onsubmit="onsubmitButton_JoinChat(); return false;"
+            style="text-align: center; width: 100%"
+          >
+            ユーザー名
+            <br />
+            <input
+              type="text"
+              id="input_username"
+              class="input_to_enter"
+              placeholder="ユーザー名を入力してください"
+              autofocus
+            /><br /><br />
+            ルーム名<br />
+            <input
+              type="text"
+              id="input_roomname"
+              class="input_to_enter"
+              placeholder="ルーム名を入力してください"
+            /><br />
+
+            <input
+              type="submit"
+              class="enter_room_button"
+              value="ルームに入る"
+            />
+          </form>
+        </div>
+
+        <div id="div_chat_screen">
+          <div class="room-tag">
+            <div class="room-tag-wrapper">
+              ユーザーネーム :
+              <input
+                type="text"
+                id="text_username"
+                readonly="readonly"
+                class="room-box"
+              />
+            </div>
+            <div class="room-tag-wrapper">
+              ルームネーム :
+              <input
+                type="text"
+                id="text_roomname"
+                readonly="readonly"
+                class="room-box"
+              />
+            </div>
+          </div>
+          <br />
+          <br />
+
+          <div class="message_list_box">
+            <ul id="list_message"></ul>
+          </div>
+          <form
+            action=""
+            onsubmit="onsubmitButton_Send(); return false;"
+            class="message-input-container"
+          >
+            <input
+              type="text"
+              class="message-input-box"
+              id="input_message"
+              autocomplete="off"
+              autofocus
+              placeholder="メッセージを入力してください"
+            /><input type="submit" class="message-input-button" value="送信" />
+            <button
+              onclick="onclickButton_LeaveChat()"
+              class="room-box room-leave-button"
+            >
+              ルームを退出する
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const g_elementDivJoinScreen = document.getElementById("div_join_screen");
+      const g_elementDivChatScreen = document.getElementById("div_chat_screen");
+      const g_elementInputUserName = document.getElementById("input_username");
+      const g_elementInputRoomName = document.getElementById("input_roomname");
+
+      const g_elementTextUserName = document.getElementById("text_username");
+      const g_elementTextRoomName = document.getElementById("text_roomname");
+
+      const g_elementInputMessage = document.getElementById("input_message");
+      const g_elementListMessage = document.getElementById("list_message");
+
+
+      let ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+      const g_socket = new WebSocket(
+        ws_scheme + "://" + window.location.host + "/ws/chat/"
+      );
+
+
+      function onsubmitButton_JoinChat() {
+
+        let strInputUserName = g_elementInputUserName.value;
+        if (!strInputUserName) {
+          return;
+        }
+        g_elementTextUserName.value = strInputUserName;
+
+
+        let strInputRoomName = g_elementInputRoomName.value;
+        g_elementTextRoomName.value = strInputRoomName;
+
+
+        g_socket.send(
+          JSON.stringify({
+            data_type: "join",
+            username: strInputUserName,
+            roomname: strInputRoomName,
+          })
+        );
+
+
+        g_elementDivJoinScreen.style.display = "none";
+        g_elementDivChatScreen.style.display = "block";
+      }
+
+
+      function onclickButton_LeaveChat() {
+
+        while (g_elementListMessage.firstChild) {
+          g_elementListMessage.removeChild(g_elementListMessage.firstChild);
+        }
+
+
+        g_elementTextUserName.value = "";
+
+
+        g_socket.send(JSON.stringify({ data_type: "leave" }));
+
+
+        g_elementDivChatScreen.style.display = "none";
+        g_elementDivJoinScreen.style.display = "flex";
+      }
+
+
+      function onsubmitButton_Send() {
+        let strMessage = g_elementInputMessage.value;
+        if (!strMessage) {
+          return;
+        }
+
+        g_socket.send(JSON.stringify({ message: strMessage }));
+        g_elementInputMessage.value = "";
+      }
+
+
+      g_socket.onmessage = (event) => {
+        if (!g_elementTextUserName.value) {
+          return;
+        }
+
+        let data = JSON.parse(event.data);
+
+        let strMessage =
+          {% comment %} data["datetime"] + " - [" + data["username"] + "] " + data["message"]; {% endcomment %}
+          data["datetime"] + " - " + data["username"] + " " + data["message"];
+          {% comment %} data["datetime"] + " - " + data["username"] +, data["message"]; {% endcomment %}
+
+        let elementLi = document.createElement("li");
+        elementLi.textContent = strMessage;
+        g_elementListMessage.prepend(elementLi);
+      };
+
+      g_socket.onclose = (event) => {
+        console.error("Unexpected : Chat socket closed.");
+      };
+    </script>
+  </body>
+</html>

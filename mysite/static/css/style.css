@@ -1,0 +1,137 @@
+input:read-only,
+textarea:read-only {
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  height: 100%;
+}
+
+#div_container {
+  min-height: 100vh;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#div_header {
+  margin: 0 auto;
+}
+
+#div_header h1 {
+  color: #6b6f59;
+}
+#div_main {
+  flex: 1; /*親要素の（縦方向の）残り全部を使う*/
+}
+
+#div_join_screen {
+  width: 100%; /*親要素(#div_main)の（縦方向の）全部を使う*/
+  height: 100%; /*親要素(#div_main)の（縦方向の）全部を使う*/
+  display: flex; /* 子要素をflex配置とする */
+  align-items: center; /*子要素を上下中央揃えとする。「display: flex」必要*/
+  z-index: 10;
+  background-color: #888;
+}
+
+#div_chat_screen {
+  margin: 0px 8px; /* bodyで「margin: 0」にしたのを戻す（ブラウザ領域境界に余白なしでHTML要素が表示されるのを余白ありに戻す） */
+  display: none; /* 初期状態非表示 */
+}
+
+.message_list_box {
+  border: 1px solid;
+  border-radius: 15px;
+  width: 80%;
+  height: 400px;
+  overflow: scroll;
+  margin: 0 auto;
+}
+
+.chat-title {
+  cursor: pointer;
+}
+
+.chat-title:hover {
+  opacity: 0.5;
+}
+
+.input_to_enter {
+  width: 200px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  margin-top: 5px;
+  margin: 5px;
+}
+
+.enter_room_button {
+  margin-top: 20px;
+  border: 1px solid;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.enter_room_button:hover {
+  color: #fff;
+}
+
+.room-box {
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.room-tag {
+  margin-left: 10px;
+}
+
+.room-tag-wrapper {
+  display: inline-block;
+  margin-left: 20px;
+}
+.message-input-container {
+  position: absolute;
+  bottom: 20px;
+  margin-left: 20px;
+  width: 100%;
+}
+
+.message-input-box {
+  height: 30px;
+  width: 700px;
+  border-radius: 5px;
+  cursor: pointer;
+  padding-left: 10px;
+}
+
+.message-input-button {
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 5px;
+  background-color: #efefef;
+}
+
+.message-input-button:hover {
+  color: #fff;
+}
+
+.room-leave-button {
+  position: absolute;
+  right: 50px;
+  cursor: pointer;
+}
+
+.room-leave-button:hover {
+  color: #fff;
+}
+
+#list_message {
+  list-style: none;
+}
